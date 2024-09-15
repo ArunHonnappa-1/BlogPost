@@ -1,0 +1,20 @@
+<component name="InspectionProjectProfileManager">
+  <profile version="1.0">
+    <option name="myName" value="Project Default" />
+    <inspection_tool class="PyStatementEffectInspection" enabled="false" level="WARNING" enabled_by_default="false" />
+    <inspection_tool class="PyUnresolvedReferencesInspection" enabled="true" level="WARNING" enabled_by_default="true">
+      <option name="ignoredIdentifiers">
+        <list>
+          <option value="PageObject.Loginpage.*" />
+          <option value="PageObject.*" />
+          <option value="PageObject.LoginPage" />
+          <option value="TestCases.test_Login.*" />
+          <option value="pageObjects.LoginPage" />
+          <option value="utilities.*" />
+          <option value="pageObjects.Loginpage.Loginpage" />
+          <option value="pageObjects.loginpage.*" />
+        </list>
+      </option>
+    </inspection_tool>
+  </profile>
+</component>
