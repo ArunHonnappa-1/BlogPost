@@ -52,7 +52,7 @@ pipeline {
             emailext (
                 subject: "Automation Test Report",
                 body: "Please check attached automation report.",
-                to: "your_email@example.com",
+                to: "arunh202@gmail.com",
                 attachLog: true
             )
         }
