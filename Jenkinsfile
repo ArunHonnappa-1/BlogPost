@@ -3,40 +3,44 @@ pipeline {
 
     environment {
         VENV = ".venv"
-        REPORT_DIR = "reports"
+    }
+
+    triggers {
+        cron('H * * * *') // Runs every hour
     }
 
     stages {
+        stage('Checkout') {
+            steps {
+                git branch: 'master', url: 'https://github.com/ArunHonnappa-1/BlogPost'
+            }
+        }
 
         stage('Setup Python') {
             steps {
-                echo "Setting up virtual environment and installing dependencies..."
-                sh 'python -m venv ${VENV}'
-                sh '${VENV}/bin/pip install --upgrade pip'
-                sh '${VENV}/bin/pip install -r requirements.txt'
+                echo 'Setting up virtual environment and installing dependencies...'
+                bat "python -m venv %VENV%"
+                bat "%VENV%\\Scripts\\pip install --upgrade pip"
+                bat "%VENV%\\Scripts\\pip install -r requirements.txt"
             }
         }
 
         stage('Run Tests') {
             steps {
-                echo "Creating reports folder if missing..."
-                sh "mkdir -p ${REPORT_DIR}"
-
-                echo "Running Selenium tests..."
-                sh "${VENV}/bin/pytest TestCases/ --html=${REPORT_DIR}/report.html --self-contained-html"
+                echo 'Running test cases...'
+                bat "%VENV%\\Scripts\\pytest --html=reports\\report.html --self-contained-html"
             }
         }
 
         stage('Publish Report') {
             steps {
-                echo "Publishing HTML test report..."
                 publishHTML(target: [
                     allowMissing: false,
                     alwaysLinkToLastBuild: true,
                     keepAll: true,
-                    reportDir: "${REPORT_DIR}",
+                    reportDir: 'reports',
                     reportFiles: 'report.html',
-                    reportName: 'Selenium Automation Report'
+                    reportName: 'Test Report'
                 ])
             }
         }
@@ -44,15 +48,14 @@ pipeline {
 
     post {
         always {
-            echo "Sending email notification..."
-
-            // Email notification
+            echo 'Sending email notification...'
             emailext (
-                subject: "Selenium Automation Test Report",
+                subject: "Automation Test Report",
                 body: "Please check attached automation report.",
-                to: "arunh202@gmail.com",
+                to: "your_email@example.com",
                 attachLog: true
             )
         }
     }
 }
+
