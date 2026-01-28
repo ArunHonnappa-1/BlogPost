@@ -1,73 +1,78 @@
 import pytest
 import time
+import string
+import random
 from selenium import webdriver
 from PageObjects.blogpost_practice import Practice
 from Utilities.readProperties import ReadConfig
-from Utilities.customlogger import LogGen
-# from selenium.webdriver.common.by import By
-import random
-import string
 
+import os
 
+class Test_001_Blogpost:
 
-
-class Test_001:
     baseURL = ReadConfig.getApplicationURL()
-    logger = LogGen.loggen()
+   
 
-    def homepage_title(self):
-        self.logger.info("**** Test_001 blogpost page title*****")
-
-        self.driver = webdriver.Chrome()
-
-        self.driver.get(self.baseURL)
-        act_title = self.driver.title
-        time.sleep(3)
-        print("act_title", act_title)
-        # self.driver.close()
-
-        if act_title == "Automation Testing Practice":
-            assert True
-            self.logger.info("*** Title***")
-        else:
-            self.driver.save_screenshot(".\\Screenshots\\" + "testhomepageTitle.png")
-            assert False
-            self.logger.info("***Title1*****")
-
-        self.driver.close()
-
-
-    def test_blogpost(self):
-        self.logger.info("**** Blogpost details entry *****")
+    # ----------------------------
+    # Pytest fixture for setup/teardown
+    # ----------------------------
+    @pytest.fixture(autouse=True)
+    def setup(self):
+        # Open Chrome
         self.driver = webdriver.Chrome()
         self.driver.maximize_window()
-        self.logger.info("**** Chrome browser*****")
+        yield
+        # Close Chrome after test
+        self.driver.quit()
 
+    # ----------------------------
+    # Random email generator
+    # ----------------------------
+    def random_email(self, size=8, chars=string.ascii_lowercase):
+        return ''.join(random.choice(chars) for _ in range(size)) + "@gmail.com"
+
+    # ----------------------------
+    # Test homepage title
+    # ----------------------------
+    def test_homepage_title(self):
+       
         self.driver.get(self.baseURL)
-        self.blog = Practice(self.driver)
+        act_title = self.driver.title
+        time.sleep(2)
+        print("Actual Title:", act_title)
 
-        self.blog.SetName("Arun")
-        self.email = self.random_generator() + "@gmail.com"
-        self.blog.Setemail(self.email)
-        time.sleep(3)
-        self.blog.SetPhone("123kejiwefnweh")
-        self.blog.SetAddress("#583 xxx, xxx,xxx")
-        self.blog.SetGender("Male")
-        self.blog.Setcountry("Australia")
-        time.sleep(3)
-        self.blog.Clickcolor()
-        self.blog.Selectpage()
-        self.blog.Selectcheckbox()
-        self.blog.Search("Test")
-        self.blog.Searchbutton()
-        time.sleep(3)
-        self.logger.info("**** User entry to blogpost is completed *****")
+        if act_title == "Automation Testing Practice":
+           
+            assert True
+        else:
+            # Take screenshot on failure
+            screenshot_folder = ".\\Screenshots"
+            os.makedirs(screenshot_folder, exist_ok=True)
+            self.driver.save_screenshot(os.path.join(screenshot_folder, "homepage_title.png"))
+            
+            assert False
 
-    def random_generator(size=4, chars=string.ascii_lowercase):
-        return ''.join(random.choice(chars) for x in range(8))
+    # ----------------------------
+    # Test filling blogpost form
+    # ----------------------------
+    def test_blogpost_form(self):
+       
+        self.driver.get(self.baseURL)
+        blog = Practice(self.driver)
 
-
-
-
-
-
+        # Fill the form
+        blog.SetName("Arun")
+        email = self.random_email()
+        blog.Setemail(email)
+        time.sleep(1)
+        blog.SetPhone("1234567890")
+        blog.SetAddress("#583, Some Street, City")
+        blog.SetGender("Male")
+        blog.Setcountry("Australia")
+        time.sleep(1)
+        blog.Clickcolor()
+        blog.Selectpage()
+        blog.Selectcheckbox()
+        blog.Search("Test")
+        blog.Searchbutton()
+        time.sleep(2)
