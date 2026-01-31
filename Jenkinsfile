@@ -6,10 +6,11 @@ pipeline {
     }
 
     triggers {
-        cron('H/5 * * * *') // Runs every 5 minutes
+        cron('H/5 * * * *')
     }
 
     stages {
+
         stage('Checkout') {
             steps {
                 git branch: 'master', url: 'https://github.com/ArunHonnappa-1/BlogPost'
@@ -18,23 +19,20 @@ pipeline {
 
         stage('Setup Python') {
             steps {
-                echo 'Setting up virtual environment and installing dependencies...'
-                bat 'python -m venv .venv'
-                bat '.venv\\Scripts\\python.exe -m pip install --upgrade pip'
+                echo 'Setting up virtual environment...'
+                bat 'python -m venv %VENV%'
+                bat '%VENV%\\Scripts\\python.exe -m pip install --upgrade pip'
 
                 script {
                     if (fileExists('requirements.txt')) {
-                        bat '.venv\\Scripts\\pip install -r requirements.txt'
+                        echo 'Installing dependencies from requirements.txt'
+                        bat '%VENV%\\Scripts\\pip install -r requirements.txt'
                     } else {
-                           else {
-                                echo 'No requirements.txt found, installing test dependencies.'
-                                bat '.venv\\Scripts\\pip install pytest pytest-html selenium'
-                            }
-
+                        echo 'No requirements.txt found. Installing basic test packages.'
+                        bat '%VENV%\\Scripts\\pip install pytest pytest-html selenium'
                     }
                 }
 
-                // Create reports folder safely
                 bat 'if not exist reports mkdir reports'
             }
         }
@@ -42,14 +40,14 @@ pipeline {
         stage('Run Tests') {
             steps {
                 echo 'Running test cases...'
-                bat '.venv\\Scripts\\python.exe -m pytest --html=reports\\report.html --self-contained-html'
+                bat '%VENV%\\Scripts\\python.exe -m pytest --html=reports\\report.html --self-contained-html'
             }
         }
 
         stage('Publish Report') {
             steps {
                 publishHTML(target: [
-                    allowMissing: true,
+                    allowMissing: false,
                     alwaysLinkToLastBuild: true,
                     keepAll: true,
                     reportDir: 'reports',
@@ -62,7 +60,7 @@ pipeline {
 
     post {
         always {
-            echo 'Pipeline finished. Email notification skipped.'
+            echo 'Pipeline finished.'
         }
     }
 }
