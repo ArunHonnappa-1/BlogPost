@@ -26,8 +26,11 @@ pipeline {
                     if (fileExists('requirements.txt')) {
                         bat '.venv\\Scripts\\pip install -r requirements.txt'
                     } else {
-                        echo 'No requirements.txt found, installing pytest only.'
-                        bat '.venv\\Scripts\\pip install pytest pytest-html'
+                           else {
+                                echo 'No requirements.txt found, installing test dependencies.'
+                                bat '.venv\\Scripts\\pip install pytest pytest-html selenium'
+                            }
+
                     }
                 }
 
