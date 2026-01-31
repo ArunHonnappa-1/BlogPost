@@ -6,7 +6,7 @@ pipeline {
     }
 
     triggers {
-        cron('H * * * *') // Runs every hour
+        cron('H/5 * * * *') // Runs every 5 minutes
     }
 
     stages {
@@ -22,9 +22,6 @@ pipeline {
                 bat 'python -m venv .venv'
                 bat '.venv\\Scripts\\python.exe -m pip install --upgrade pip'
                 bat '.venv\\Scripts\\pip install -r requirements.txt'
-    }
-}
-
             }
         }
 
@@ -53,12 +50,19 @@ pipeline {
         always {
             echo 'Sending email notification...'
             emailext (
-                subject: "Automation Test Report",
-                body: "Please check attached automation report.",
+                subject: "Automation Test Report - Build #${BUILD_NUMBER}",
+                body: """Hi Team,
+
+Please find the attached automation test report.
+
+Job: ${JOB_NAME}
+Build: ${BUILD_NUMBER}
+Status: ${BUILD_STATUS}
+URL: ${BUILD_URL}""",
                 to: "arunh202@gmail.com",
+                attachFiles: 'reports/report.html', // Attach HTML report
                 attachLog: true
             )
         }
     }
 }
-
