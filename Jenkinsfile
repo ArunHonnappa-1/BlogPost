@@ -47,11 +47,25 @@ pipeline {
     }
 
     post {
-        always {
-            echo 'Sending email notification...'
-            emailext (
-                subject: "Automation Test Report - Build #${BUILD_NUMBER}",
-                body: """Hi Team,
+    always {
+        echo 'Sending email notification...'
+        emailext (
+            subject: "Automation Test Report - Build #${BUILD_NUMBER}",
+            body: """Hi Team,
+
+Please find the automation test report attached.
+
+Job: ${JOB_NAME}
+Build: ${BUILD_NUMBER}
+Status: ${currentBuild.currentResult}
+URL: ${BUILD_URL}""",
+            to: "arunh202@gmail.com",
+            attachmentsPattern: 'reports/report.html',
+            attachLog: true
+        )
+    }
+}
+
 
 Please find the automation test report attached.
 
