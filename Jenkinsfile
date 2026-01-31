@@ -22,43 +22,44 @@ pipeline {
                 bat 'python -m venv .venv'
                 bat '.venv\\Scripts\\python.exe -m pip install --upgrade pip'
 
-                // Install dependencies if requirements.txt exists
                 script {
                     if (fileExists('requirements.txt')) {
                         bat '.venv\\Scripts\\pip install -r requirements.txt'
                     } else {
-                        echo 'No requirements.txt found, skipping dependency installation.'
+                        echo 'No requirements.txt found, installing pytest only.'
+                        bat '.venv\\Scripts\\pip install pytest pytest-html'
                     }
                 }
+
+                // Create reports folder safely
+                bat 'if not exist reports mkdir reports'
             }
         }
 
         stage('Run Tests') {
             steps {
                 echo 'Running test cases...'
-                bat "%VENV%\\Scripts\\pytest"
+                bat '.venv\\Scripts\\python.exe -m pytest --html=reports\\report.html --self-contained-html'
             }
         }
 
-        // Optional: If your framework starts generating HTML reports later, you can add this stage back
-        // stage('Publish Report') {
-        //     steps {
-        //         publishHTML(target: [
-        //             allowMissing: false,
-        //             alwaysLinkToLastBuild: true,
-        //             keepAll: true,
-        //             reportDir: 'reports',
-        //             reportFiles: 'report.html',
-        //             reportName: 'Test Report'
-        //         ])
-        //     }
-        // }
+        stage('Publish Report') {
+            steps {
+                publishHTML(target: [
+                    allowMissing: true,
+                    alwaysLinkToLastBuild: true,
+                    keepAll: true,
+                    reportDir: 'reports',
+                    reportFiles: 'report.html',
+                    reportName: 'Test Report'
+                ])
+            }
+        }
     }
 
     post {
         always {
             echo 'Pipeline finished. Email notification skipped.'
-            // Mail step removed to avoid SMTP errors
         }
     }
 }
