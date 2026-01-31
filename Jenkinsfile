@@ -53,14 +53,14 @@ pipeline {
                 subject: "Automation Test Report - Build #${BUILD_NUMBER}",
                 body: """Hi Team,
 
-Please find the attached automation test report.
+Please find the automation test report attached.
 
 Job: ${JOB_NAME}
 Build: ${BUILD_NUMBER}
 Status: ${BUILD_STATUS}
 URL: ${BUILD_URL}""",
                 to: "arunh202@gmail.com",
-                attachFiles: 'reports/report.html', // Attach HTML report
+                attachmentsPattern: 'reports/report.html', // <-- Correct for Pipeline
                 attachLog: true
             )
         }
