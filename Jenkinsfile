@@ -59,23 +59,23 @@ pipeline {
 
     post {
         always {
-            echo 'Sending email notification...'
+            echo 'Pipeline finished. Email notification skipped.'
 
-            // Use Jenkins built-in mail step (no attachment support)
-            mail(
-                to: 'arunh202@gmail.com',
-                subject: "Automation Test Report - Build #${BUILD_NUMBER}",
-                body: """Hi Team,
+//             // Use Jenkins built-in mail step (no attachment support)
+//             mail(
+//                 to: 'arunh202@gmail.com',
+//                 subject: "Automation Test Report - Build #${BUILD_NUMBER}",
+//                 body: """Hi Team,
 
-Please find the automation test report link below:
+// Please find the automation test report link below:
 
-Job: ${JOB_NAME}
-Build: ${BUILD_NUMBER}
-Status: ${currentBuild.currentResult}
-URL: ${BUILD_URL}
+// Job: ${JOB_NAME}
+// Build: ${BUILD_NUMBER}
+// Status: ${currentBuild.currentResult}
+// URL: ${BUILD_URL}
 
-Note: Report attachment not supported in this setup."""
-            )
+// Note: Report attachment not supported in this setup."""
+//             )
         }
     }
 }
