@@ -21,7 +21,18 @@ pipeline {
                 echo 'Setting up virtual environment and installing dependencies...'
                 bat 'python -m venv .venv'
                 bat '.venv\\Scripts\\python.exe -m pip install --upgrade pip'
-                bat '.venv\\Scripts\\pip install -r requirements.txt'
+
+                // Install dependencies if requirements.txt exists
+                script {
+                    if (fileExists('requirements.txt')) {
+                        bat '.venv\\Scripts\\pip install -r requirements.txt'
+                    } else {
+                        echo 'No requirements.txt found, skipping dependency installation.'
+                    }
+                }
+
+                // Create reports folder to avoid pytest errors
+                bat 'mkdir reports'
             }
         }
 
@@ -47,35 +58,18 @@ pipeline {
     }
 
     post {
-    always {
-        echo 'Sending email notification...'
-        emailext (
-            subject: "Automation Test Report - Build #${BUILD_NUMBER}",
-            body: """Hi Team,
-
-Please find the automation test report attached.
-
-Job: ${JOB_NAME}
-Build: ${BUILD_NUMBER}
-Status: ${currentBuild.currentResult}
-URL: ${BUILD_URL}
-""",
-            to: "arunh202@gmail.com",
-            attachmentsPattern: 'reports/report.html',
-            attachLog: true
-        )
-    }
-}
-
-
-Please find the automation test report attached.
-
-Job: ${JOB_NAME}
-Build: ${BUILD_NUMBER}
-Status: ${BUILD_STATUS}
-URL: ${BUILD_URL}""",
+        always {
+            echo 'Sending email notification...'
+            emailext(
+                subject: "Automation Test Report - Build #${BUILD_NUMBER}",
+                body: "Hi Team,\n\n" +
+                      "Please find the automation test report attached.\n\n" +
+                      "Job: ${JOB_NAME}\n" +
+                      "Build: ${BUILD_NUMBER}\n" +
+                      "Status: ${currentBuild.currentResult}\n" +
+                      "URL: ${BUILD_URL}",
                 to: "arunh202@gmail.com",
-                attachmentsPattern: 'reports/report.html', // <-- Correct for Pipeline
+                attachmentsPattern: 'reports/report.html',
                 attachLog: true
             )
         }
